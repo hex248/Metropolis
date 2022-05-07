@@ -1,15 +1,27 @@
 ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
+    - AudioManager
     - Building
     - CameraController
     - CityManager
+    - ConstructionOption
     - GameManager
     - Hover
+    - LightingManager
+    - LightingPreset
     - MapBuilder
+    - NPC
+    - NPCEncounter
+    - NPCManager
     - Plot
+    - StatisticsManager
+    - TaskComponent
+    - TaskManager
+    - TaskPreset
     - UIManager
     Unity.Rider.Editor.dll:
+    - Packages.Rider.Editor.RiderScriptEditorData
     - Packages.Rider.Editor.UnitTesting.CallbackData
     Unity.TextMeshPro.dll:
     - TMPro.TMP_FontAsset
@@ -17,6 +29,8 @@ ScriptsOnlyBuild:
     - TMPro.TMP_SpriteAsset
     - TMPro.TMP_StyleSheet
     - TMPro.TextMeshProUGUI
+    Unity.Timeline.Editor.dll:
+    - TimelinePreferences
     UnityEditor.Graphs.dll:
     - UnityEditor.Graphs.AnimationBlendTree.Graph
     - UnityEditor.Graphs.AnimationBlendTree.GraphGUI
@@ -33,7 +47,11 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.GraphicRaycaster
+    - UnityEngine.UI.GridLayoutGroup
     - UnityEngine.UI.Image
+    - UnityEngine.UI.Mask
+    - UnityEngine.UI.ScrollRect
+    - UnityEngine.UI.Scrollbar
   sceneClasses:
     Assets/Scenes/Main.unity:
     - Class: 1
@@ -60,6 +78,10 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
+    - Class: 82
+      Script: {instanceID: 0}
+    - Class: 83
+      Script: {instanceID: 0}
     - Class: 89
       Script: {instanceID: 0}
     - Class: 104
@@ -69,41 +91,73 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 1480}
     - Class: 114
-      Script: {instanceID: 1524}
+      Script: {instanceID: 1482}
     - Class: 114
-      Script: {instanceID: 1752}
+      Script: {instanceID: 1672}
     - Class: 114
-      Script: {instanceID: 2038}
+      Script: {instanceID: 1754}
     - Class: 114
-      Script: {instanceID: 2252}
+      Script: {instanceID: 2040}
     - Class: 114
-      Script: {instanceID: 2352}
+      Script: {instanceID: 2250}
     - Class: 114
-      Script: {instanceID: 2466}
+      Script: {instanceID: 2256}
     - Class: 114
-      Script: {instanceID: 2510}
+      Script: {instanceID: 2312}
     - Class: 114
-      Script: {instanceID: 2824}
+      Script: {instanceID: 2358}
     - Class: 114
-      Script: {instanceID: 2912}
+      Script: {instanceID: 2472}
     - Class: 114
-      Script: {instanceID: 3114}
+      Script: {instanceID: 2478}
     - Class: 114
-      Script: {instanceID: 3144}
+      Script: {instanceID: 2518}
     - Class: 114
-      Script: {instanceID: 3180}
+      Script: {instanceID: 2728}
     - Class: 114
-      Script: {instanceID: 3450}
+      Script: {instanceID: 2834}
     - Class: 114
-      Script: {instanceID: 3884}
+      Script: {instanceID: 2844}
     - Class: 114
-      Script: {instanceID: 3924}
+      Script: {instanceID: 2922}
     - Class: 114
-      Script: {instanceID: 4162}
+      Script: {instanceID: 2936}
     - Class: 114
-      Script: {instanceID: 4230}
+      Script: {instanceID: 3126}
     - Class: 114
-      Script: {instanceID: 4402}
+      Script: {instanceID: 3156}
+    - Class: 114
+      Script: {instanceID: 3192}
+    - Class: 114
+      Script: {instanceID: 3238}
+    - Class: 114
+      Script: {instanceID: 3464}
+    - Class: 114
+      Script: {instanceID: 3468}
+    - Class: 114
+      Script: {instanceID: 3506}
+    - Class: 114
+      Script: {instanceID: 3668}
+    - Class: 114
+      Script: {instanceID: 3802}
+    - Class: 114
+      Script: {instanceID: 3902}
+    - Class: 114
+      Script: {instanceID: 3914}
+    - Class: 114
+      Script: {instanceID: 3944}
+    - Class: 114
+      Script: {instanceID: 4182}
+    - Class: 114
+      Script: {instanceID: 4214}
+    - Class: 114
+      Script: {instanceID: 4252}
+    - Class: 114
+      Script: {instanceID: 4424}
+    - Class: 114
+      Script: {instanceID: 4540}
+    - Class: 114
+      Script: {instanceID: 4630}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -129,16 +183,16 @@ ScriptsOnlyBuild:
     className: GraphicRaycaster
   - hash:
       serializedVersion: 2
-      Hash: 5ab533713adae59372fb3e10a585c186
-    assemblyName: Unity.Timeline.dll
-    namespaceName: UnityEngine.Timeline
-    className: AnimationPlayableAsset
-  - hash:
-      serializedVersion: 2
       Hash: a6e561615949734e9f12f9b61661f43e
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: Image
+  - hash:
+      serializedVersion: 2
+      Hash: 5ab533713adae59372fb3e10a585c186
+    assemblyName: Unity.Timeline.dll
+    namespaceName: UnityEngine.Timeline
+    className: AnimationPlayableAsset
   - hash:
       serializedVersion: 2
       Hash: 77aaaaa51f7a8d8ff333a879741e47d2
@@ -169,6 +223,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.UI
     className: Selectable
+  - hash:
+      serializedVersion: 2
+      Hash: 8197e09e42c410c9150f9b7e8f2d4efc
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: NPCManager
   - hash:
       serializedVersion: 2
       Hash: 21a9c6dbf300fc1f6dc15ca7e2c39a37
@@ -225,10 +285,22 @@ ScriptsOnlyBuild:
     className: RawImage
   - hash:
       serializedVersion: 2
+      Hash: 636f34a7b8a9d17775614518362d2a83
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: StatisticsManager
+  - hash:
+      serializedVersion: 2
       Hash: 36ae7cc3e989c6df9341b63a0b042603
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Plot
+  - hash:
+      serializedVersion: 2
+      Hash: b0e2b0ea0c7bb48a52ad09fcd09bb7f6
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: TaskPreset
   - hash:
       serializedVersion: 2
       Hash: a1aa98c78061c6f03a8c124cda576e67
@@ -247,6 +319,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.EventSystems
     className: EventSystem
+  - hash:
+      serializedVersion: 2
+      Hash: 9b32e679f564feba50b7411d4e92ae43
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: NPC
   - hash:
       serializedVersion: 2
       Hash: fe64a45214940b510a0ec79c96d43498
@@ -303,6 +381,12 @@ ScriptsOnlyBuild:
     className: TestResultRendererCallback
   - hash:
       serializedVersion: 2
+      Hash: e88ec83f18ae95e16decf331756d37b3
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: TaskComponent
+  - hash:
+      serializedVersion: 2
       Hash: 748dd2a2a28da4e618912da5ac45684b
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.EventSystems
@@ -345,6 +429,12 @@ ScriptsOnlyBuild:
     className: Button
   - hash:
       serializedVersion: 2
+      Hash: ca378a5445fa4cd8eaf66f142e4a4214
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: LightingManager
+  - hash:
+      serializedVersion: 2
       Hash: 4fd8bf02e3089425d3502e26c44ba31a
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
@@ -357,7 +447,7 @@ ScriptsOnlyBuild:
     className: ContentSizeFitter
   - hash:
       serializedVersion: 2
-      Hash: 22edf904028b0a388bc5a882467d1bcd
+      Hash: 5d837ecc280732337ff3fc242e2d657b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Building
@@ -387,7 +477,7 @@ ScriptsOnlyBuild:
     className: VerticalLayoutGroup
   - hash:
       serializedVersion: 2
-      Hash: 7d6d696ae07c03e100626a0e3818104f
+      Hash: 7e5a60b2b75f20e887b4234bf47ed937
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
@@ -457,6 +547,18 @@ ScriptsOnlyBuild:
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Hover
+  - hash:
+      serializedVersion: 2
+      Hash: f4f3c84b91d90b62516ab58611a6ee0e
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: LightingPreset
+  - hash:
+      serializedVersion: 2
+      Hash: 95573cb8a801214e02c77123d6a87208
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: TaskManager
   - hash:
       serializedVersion: 2
       Hash: a81d4c2c1cf3ad164d277d927a193679
@@ -531,7 +633,13 @@ ScriptsOnlyBuild:
     className: TMP_Settings
   - hash:
       serializedVersion: 2
-      Hash: 684593f7f274c199dd0d9472ba346a1f
+      Hash: f5fae3688b5542866493d9558afad5a6
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: AudioManager
+  - hash:
+      serializedVersion: 2
+      Hash: a1ed0ec69590a7116006e77f70155310
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: MapBuilder
@@ -549,19 +657,25 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAsset
   - hash:
       serializedVersion: 2
+      Hash: 2ea04379eb09339170d0789c5f46532d
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: ConstructionOption
+  - hash:
+      serializedVersion: 2
       Hash: e7a73f5f78ba6445195ec23b74a1ce2d
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
     className: TMP_ScrollbarEventHandler
   - hash:
       serializedVersion: 2
-      Hash: 8eeef503983091c8f938ee288ed506a2
+      Hash: 6f1bb067169218c15bf9c913607e16cb
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: CameraController
   - hash:
       serializedVersion: 2
-      Hash: 5dcaa23ae7973809d221daed9b6b14c0
+      Hash: 587c2e86d24a2ca1af85205f26463078
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: UIManager
@@ -589,7 +703,13 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.UI.dll
     namespaceName: UnityEngine.EventSystems
     className: TouchInputModule
+  - hash:
+      serializedVersion: 2
+      Hash: 5122743861a4ad9814a5db9c8b46936d
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: NPCEncounter
   platform: 19
   scenePathNames:
   - Assets/Scenes/Main.unity
-  playerPath: D:/Metropolis/Metropolis/Builds/Metropolis.exe
+  playerPath: D:/Metropolis/Metropolis/Builds/v2.0.0/Metropolis.exe

@@ -10,5 +10,14 @@ public class TaskPreset : ScriptableObject
     public string description;
     public string[] dialogue;
 
+    public BuildingTypes buildingNeeded;
+    public int amountNeeded;
+
+    public int reward;
+
     public int difficulty; // 1-5, 1 being easy, 5 being difficult
+
+    public  TaskTypes taskType;
+
+    public float emissionsTargetPercentage;
 }

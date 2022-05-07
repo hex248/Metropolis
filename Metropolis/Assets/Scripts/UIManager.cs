@@ -24,11 +24,13 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] Transform tasksPanel;
     [SerializeField] GameObject taskPrefab;
-    List<Task> oldtasks = new List<Task>();
 
 
     [SerializeField] GameObject statsParent;
     [SerializeField] TextMeshProUGUI emissionsText;
+    [SerializeField] TextMeshProUGUI balanceText;
+    [SerializeField] TextMeshProUGUI timeText;
+    [SerializeField] TextMeshProUGUI costOfActionText;
 
     Vector3 constructionDestination = new Vector3(110.0f, 240.0f, 0.0f);
     Vector3 populationDestination = new Vector3(230.0f, 230.0f, 0.0f);
@@ -59,7 +61,7 @@ public class UIManager : MonoBehaviour
         taskParent.SetActive(false);
         npcEncounterParent.SetActive(false);
 
-        AddTasksToDisplay();
+        AddTasksToDisplay(true);
     }
 
     void Update()
@@ -69,6 +71,7 @@ public class UIManager : MonoBehaviour
             constructionParent.SetActive(true);
             constructionTooltip.SetActive(true);
             destructionTooltip.SetActive(true);
+            costOfActionText.text = $"Cost of Action: ${gameManager.costOfAction}";
         }
         else
         {
@@ -175,7 +178,7 @@ public class UIManager : MonoBehaviour
         actionButtonActivated = false;
     }
 
-    public void AddTasksToDisplay()
+    public void AddTasksToDisplay(bool initialLoad = false)
     {
         foreach (Transform child in tasksPanel.transform)
         {
@@ -198,13 +201,25 @@ public class UIManager : MonoBehaviour
     public void UpdateStats()
     {
         emissionsText.text = $"Emissions: {Mathf.Round((statsManager.stats.emissions / statsManager.stats.maximumEmissions) * 100)}%";
+        balanceText.text = $"${gameManager.balance}";
+
+        // time
+        int timeHours = 0;
+        int timeMins = 0;
+
+        timeHours = (int)Mathf.Floor(statsManager.stats.timeOfDay);
+        timeMins = (int)Mathf.Floor((statsManager.stats.timeOfDay - timeHours) * 60);
+
+        string timeHoursStr = timeHours < 10 ? $"0{timeHours}" : $"{timeHours}";
+        string timeMinsStr = timeMins < 10 ? $"0{timeMins}" : $"{timeMins}";
+        timeText.text = $"{timeHoursStr}:{timeMinsStr}";
+
     }
 
     public NPCEncounter NPCPopup()
     {
-        //! NOTE: PARENTS DONT GET DISABLED
-        Debug.Log("adwadadad");
         actionMenuParent.SetActive(false);
+        statsParent.SetActive(false);
         constructionParent.SetActive(false);
         populationParent.SetActive(false);
         taskParent.SetActive(false);
@@ -212,5 +227,12 @@ public class UIManager : MonoBehaviour
 
 
         return npcEncounterParent.GetComponent<NPCEncounter>();
+    }
+
+    public void HideNPCPopup()
+    {
+        actionMenuParent.SetActive(true);
+        statsParent.SetActive(true);
+        npcEncounterParent.SetActive(false);
     }
 }

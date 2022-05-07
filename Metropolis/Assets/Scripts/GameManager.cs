@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 using UnityEngine;
 
 public enum GamePlayModes
@@ -32,24 +34,39 @@ public class GameManager : MonoBehaviour
     CityManager cityManager;
     MapBuilder mapBuilder;
     TaskManager taskManager;
+    NPCManager npcManager;
 
     UIManager ui;
 
+    public bool playing;
+
+    public int balance = 30000;
+    public int costOfAction = 0;
+
+    string saveDirectory;
+    string savePath;
+
     void Start()
     {
+        saveDirectory = Application.persistentDataPath + $"/saves/{saveName}";
+        savePath = saveDirectory + $"/balance.dat";
+        LoadBalance();
+
         desiredRotation = 0;
         cityManager = GameObject.Find("CityManager").GetComponent<CityManager>();
         mapBuilder = GameObject.Find("CityManager").GetComponent<MapBuilder>();
         taskManager = GameObject.Find("TaskManager").GetComponent<TaskManager>();
+        npcManager = GameObject.Find("NPCManager").GetComponent<NPCManager>();
 
         ui = GameObject.Find("Canvas").GetComponent<UIManager>();
+        playing = true;
     }
 
     void LateUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.F8))
+        if (Input.GetKeyDown(KeyCode.F8) && playing)
         {
-            taskManager.CreateTask("Citizen", "Build a school", "Use the construction menu to construct a school for Citizen's children", 1);
+            npcManager.PopUp();
         }
         if (currentMode == GamePlayModes.construction || currentMode == GamePlayModes.destruction)
         {
@@ -74,60 +91,15 @@ public class GameManager : MonoBehaviour
                 desiredRotation = Rotate(desiredRotation, 90, RotationTypes.clockwise);
             }
         }
-        if (1 < 0) // disabled
-        {
-            if (currentMode == GamePlayModes.construction)
-            {
-                Renderer[] allPavementRenderers = pavementParent.GetComponentsInChildren<Renderer>();
-
-                for (int i = 0; i < allPavementRenderers.Length; i++)
-                {
-                    allPavementRenderers[i].material.color = constructionBlockedColor;
-                }
-
-                // make buildings invisible
-
-                buildingsParent.gameObject.SetActive(false);
-
-            }
-            else if (currentMode == GamePlayModes.destruction)
-            {
-                Renderer[] allPavementRenderers = pavementParent.GetComponentsInChildren<Renderer>();
-
-                for (int i = 0; i < allPavementRenderers.Length; i++)
-                {
-                    Plot plot = allPavementRenderers[i].gameObject.GetComponent<Plot>();
-
-                    if (cityManager.map[plot.x][plot.y].occupied)
-                    {
-                        allPavementRenderers[i].material.color = destroyableColor;
-                    }
-                    else
-                    {
-                        allPavementRenderers[i].material.color = oldPavementColor;
-                    }
-                }
-
-                // make buildings invisible
-
-                buildingsParent.gameObject.SetActive(false);
-            }
-            else if (currentMode == GamePlayModes.none)
-            {
-                Renderer[] allPavementRenderers = pavementParent.GetComponentsInChildren<Renderer>();
-
-                for (int i = 0; i < allPavementRenderers.Length; i++)
-                {
-                    allPavementRenderers[i].material.color = oldPavementColor;
-                }
-
-                // make buildings visible
-
-                buildingsParent.gameObject.SetActive(true);
-            }
-        }
     }
 
+    public void ChangeBalance(int change)
+    {
+        balance += change;
+        SaveBalance();
+    }
+
+    #region
     public void ConstructionButtonPressed()
     {
         currentMode = GamePlayModes.construction;
@@ -162,9 +134,10 @@ public class GameManager : MonoBehaviour
 
     public void ConstructionOptionSelected(ConstructionOption option)
     {
-        Debug.Log(option.buildingType);
         chosenBuilding = option.buildingType;
     }
+
+    #endregion
 
     int Rotate(int originalRotation, int amountToRotate, RotationTypes rotationType)
     {
@@ -180,4 +153,43 @@ public class GameManager : MonoBehaviour
         }
         return newRotation;
     }
+
+
+    void LoadBalance()
+    {
+        if (!Directory.Exists(saveDirectory))
+        {
+            Directory.CreateDirectory(saveDirectory);
+        }
+        if (File.Exists(savePath))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(savePath, FileMode.Open);
+            BalanceSaveFile data = (BalanceSaveFile)bf.Deserialize(file);
+            file.Close();
+
+            balance = data.balance;
+        }
+        else
+        {
+            SaveBalance();
+        }
+    }
+
+    void SaveBalance()
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(savePath);
+        BalanceSaveFile data = new BalanceSaveFile(); // create a new data object to write to
+        data.balance = balance; // export current balance
+        
+        bf.Serialize(file, data);
+        file.Close();
+    }
+}
+
+[System.Serializable]
+class BalanceSaveFile
+{
+    public int balance;
 }

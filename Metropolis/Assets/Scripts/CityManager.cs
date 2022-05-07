@@ -22,6 +22,9 @@ public class Cell
 public class CityManager : MonoBehaviour
 {
     GameManager gameManager;
+    AudioManager audioManager;
+    UIManager uiManager;
+    TaskManager taskManager;
     StatisticsManager statsManager;
 
     MapBuilder mapBuilder;
@@ -32,17 +35,32 @@ public class CityManager : MonoBehaviour
 
     [SerializeField][Range(0,1000)] int mapSize = 100;
 
+    Dictionary<BuildingTypes, int> constructionCosts = new Dictionary<BuildingTypes, int>();
+
     bool levelLoaded;
 
     void Start()
     {
         mapBuilder = GetComponent<MapBuilder>();
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        taskManager = GameObject.Find("TaskManager").GetComponent<TaskManager>();
         statsManager = GameObject.Find("StatisticsManager").GetComponent<StatisticsManager>();
         saveDirectory = Application.persistentDataPath + $"/saves/{gameManager.saveName}";
         savePath = saveDirectory + $"/map.dat";
         // load level
         levelLoaded = false;
+
+        constructionCosts.Add(BuildingTypes.House, 300);
+        constructionCosts.Add(BuildingTypes.Office, 750);
+        constructionCosts.Add(BuildingTypes.Factory, 1500);
+        constructionCosts.Add(BuildingTypes.Shop, 600);
+        constructionCosts.Add(BuildingTypes.School, 750);
+        constructionCosts.Add(BuildingTypes.Hospital, 900);
+        constructionCosts.Add(BuildingTypes.Tree, 100);
+        constructionCosts.Add(BuildingTypes.Hedge, 80);
+        constructionCosts.Add(BuildingTypes.Grass, 30);
     }
 
     void LateUpdate()
@@ -112,6 +130,13 @@ public class CityManager : MonoBehaviour
 
     public GameBuilding PlaceBuilding(int x, int y, GameBuilding building)
     {
+        if (gameManager.costOfAction > gameManager.balance)
+        {
+            // play insufficient funds sound effect
+            audioManager.PlaySoundEffect("InsufficientFunds");
+
+            return building;
+        }
         building.x = x;
         building.y = y;
         map[x][y].building = building;
@@ -119,7 +144,9 @@ public class CityManager : MonoBehaviour
         map[x][y].occupied = true;
 
         mapBuilder.NewBuilding(x, y, building);
-        statsManager.BuildingChange(building.buildingType, true);
+        taskManager.NewBuilding(building.buildingType);
+        statsManager.BuildingChange();
+        gameManager.ChangeBalance(-constructionCosts[building.buildingType]);
         SaveLevel();
 
         return building;
@@ -127,7 +154,13 @@ public class CityManager : MonoBehaviour
 
     public void ShowBuildingPreview(int x, int y, GameBuilding building)
     {
-        if (map[x][y].occupied) return;
+        if (map[x][y].occupied)
+        {
+            mapBuilder.ClearPreview();
+            return;
+        }
+
+        gameManager.costOfAction = constructionCosts[building.buildingType];
         mapBuilder.PreviewBuilding(x, y, building);
     }
 
@@ -138,7 +171,7 @@ public class CityManager : MonoBehaviour
         map[x][y].occupied = false;
 
         mapBuilder.DestroyBuilding(buildingObj);
-        statsManager.BuildingChange(building.buildingType, false);
+        statsManager.BuildingChange();
         SaveLevel();
         return building;
     }

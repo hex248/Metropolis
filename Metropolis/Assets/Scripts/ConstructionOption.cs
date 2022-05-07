@@ -6,12 +6,12 @@ using UnityEngine.UI;
 
 public class ConstructionOption : MonoBehaviour
 {
+    [SerializeField] Sprite previewSprite;
     [SerializeField] GameObject preview;
     public BuildingTypes buildingType;
     GameObject optionPrefab;
     Dictionary<string, GameObject> prefabs = new Dictionary<string, GameObject>();
     Object[] prefabsArr;
-    Texture2D previewTexture;
     bool previewLoaded = false;
 
     void Start()
@@ -22,17 +22,6 @@ public class ConstructionOption : MonoBehaviour
             prefabs.Add(prefab.name, (GameObject)prefab);
         }
         optionPrefab = prefabs[buildingType.ToString()];
-        previewTexture = AssetPreview.GetAssetPreview(optionPrefab);
-    }
-    
-    void Update()
-    {
-        if (previewTexture != null && !previewLoaded)
-        {
-            previewLoaded = true;
-            Rect rect = new Rect(0, 0, previewTexture.width, previewTexture.height);
-            Vector2 pivot = new Vector2(previewTexture.height / 2, previewTexture.width / 2);
-            preview.GetComponent<Image>().sprite = Sprite.Create(previewTexture, rect, pivot);
-        }
+        preview.GetComponent<Image>().sprite = previewSprite;
     }
 }

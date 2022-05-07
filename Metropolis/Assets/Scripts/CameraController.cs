@@ -13,35 +13,48 @@ public class CameraController : MonoBehaviour
     Vector3 resetCamera;
     [SerializeField] Transform drone;
 
+    GameManager gameManager;
+
     void Start()
     {
         resetCamera = Camera.main.transform.position;
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     void Update()
     {
-        panSpeed = Camera.main.orthographicSize;
-        // wasd movement
-        drone.position += (Input.GetAxisRaw("Horizontal") * drone.right * Time.fixedDeltaTime * panSpeed) +
-            (Input.GetAxisRaw("Vertical") * drone.forward * Time.fixedDeltaTime * panSpeed);
-        
-        if (Input.GetMouseButton(2))
+        if (gameManager.playing)
         {
-            transform.position = resetCamera;
-        }
+            // make move speed relative to zoom
+            panSpeed = Camera.main.orthographicSize;
 
-        if (!EventSystem.current.IsPointerOverGameObject())
-        {
-            if (Input.mouseScrollDelta.y > 0)
-            {
-                Camera.main.orthographicSize -= zoomChange * Time.deltaTime * smoothChange;
-            }
-            if (Input.mouseScrollDelta.y < 0)
-            {
-                Camera.main.orthographicSize += zoomChange * Time.deltaTime * smoothChange;
-            }
-        }
+            // wasd movement
+            drone.position += (Input.GetAxisRaw("Horizontal") * drone.right * Time.fixedDeltaTime * panSpeed) +
+                (Input.GetAxisRaw("Vertical") * drone.forward * Time.fixedDeltaTime * panSpeed);
 
-        Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minSize, maxSize);
+            // camera reset
+            if (Input.GetMouseButton(2))
+            {
+                transform.position = resetCamera;
+            }
+
+            // if not hovering over UI
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                // zoom out
+                if (Input.mouseScrollDelta.y > 0)
+                {
+                    Camera.main.orthographicSize -= zoomChange * Time.deltaTime * smoothChange;
+                }
+                // zoom in
+                if (Input.mouseScrollDelta.y < 0)
+                {
+                    Camera.main.orthographicSize += zoomChange * Time.deltaTime * smoothChange;
+                }
+            }
+
+            // clamp zoom in allowed range
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minSize, maxSize);
+        }
     }
 }

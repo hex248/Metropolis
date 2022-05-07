@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: 5 Trees
   m_EditorClassIdentifier: 
   taskName: Plant 5 Trees
-  description: Use the construction menu to plant 3 new trees.
+  description: Use the construction menu to plant 5 new trees.
   dialogue:
   - Hello there!
   - The city doesn't have enough nature in it!
   - I would love to have a nice quiet place for reading.
   - Thanks Mayor!
+  buildingNeeded: 6
+  amountNeeded: 5
+  reward: 600
   difficulty: 2

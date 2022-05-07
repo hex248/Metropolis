@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Hover.cs" />
     <Compile Include="Assets\Scripts\LightingPreset.cs" />
     <Compile Include="Assets\Scripts\TaskManager.cs" />
+    <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Scripts\MapBuilder.cs" />
     <Compile Include="Assets\Scripts\ConstructionOption.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />

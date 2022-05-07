@@ -8,21 +8,18 @@ public class LightingManager : MonoBehaviour
     [SerializeField] Light directionalLight;
     [SerializeField] LightingPreset preset;
 
-    [SerializeField, Range(0, 24)] float timeOfDay;
-    [SerializeField, Range(0, 50)] float timeScale;
+    float timeOfDay;
+
+    StatisticsManager stats;
+    private void Start()
+    {
+        stats = GameObject.Find("StatisticsManager").GetComponent<StatisticsManager>();
+    }
 
     private void Update()
     {
-        if (Application.isPlaying)
-        {
-            timeOfDay += Time.deltaTime / 60; // one minute is equal to one hour in game
-            timeOfDay %= 24;
-            UpdateLighting(timeOfDay / 24);
-        }
-        else
-        {
-            UpdateLighting(timeOfDay / 24);
-        }
+        timeOfDay = stats.stats.timeOfDay;
+        UpdateLighting(timeOfDay / 24);
     }
 
     void UpdateLighting(float timePercent)

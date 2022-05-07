@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b96033a82a3b17469a84fe6c3eb2204, type: 3}
+  m_Name: Critically High Emissions
+  m_EditorClassIdentifier: 
+  taskName: Critically High Emissions
+  description: Your emissions are far too high. Try to get them below 90%
+  dialogue:
+  - Mayor! Mayor!
+  - What are you doing!??!?!
+  - Your emissions are above 95%, you need to bring them down!
+  - But how?
+  - Maybe we could plant some trees.
+  - Try to get your emissions down to 90%
+  buildingNeeded: 0
+  amountNeeded: 0
+  reward: 500
+  difficulty: 3
+  taskType: 1
+  emissionsTargetPercentage: 90

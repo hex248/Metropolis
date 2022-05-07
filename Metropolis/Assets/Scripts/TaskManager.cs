@@ -4,8 +4,14 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
 
+public enum TaskTypes
+{
+    construction,
+    emissions
+}
+
 [System.Serializable]
-public class Task : ScriptableObject
+public class Task
 {
     public string npcName;
     public string taskName;
@@ -13,19 +19,48 @@ public class Task : ScriptableObject
 
     public int difficulty; // 1-5, 1 being easy, 5 being difficult
 
-    public Task(string npcName, string taskName, string description, int difficulty)
+    public BuildingTypes buildingNeeded;
+    public int completed;
+    public int amountNeeded;
+
+    public int reward;
+
+    public TaskTypes taskType;
+
+    public float emissionsTargetPercentage;
+
+    public bool seen = false;
+
+
+
+    public Task(string npcName, string taskName, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage)
     {
         this.npcName = npcName;
         this.taskName = taskName;
         this.description = description;
         this.difficulty = difficulty;
+        this.buildingNeeded = buildingNeeded;
+        this.amountNeeded = amountNeeded;
+        this.reward = reward;
+        this.taskType = taskType;
+        this.emissionsTargetPercentage = emissionsTargetPercentage;
+    }
+
+    public bool Add(int amount=1)
+    {
+        completed += amount;
+        if (completed >= amountNeeded)
+        {
+            return true;
+        }
+        return false;
     }
 }
 
 
 public class TaskManager : MonoBehaviour
 {
-    public TaskPreset[] taskPresets;
+    public List<TaskPreset> taskPresets = new List<TaskPreset>();
 
     public List<Task> tasks = new List<Task>();
 
@@ -43,9 +78,33 @@ public class TaskManager : MonoBehaviour
         LoadTasks();
     }
 
-    public void CreateTask(string npcName, string name, string description, int difficulty)
+
+    public void NewBuilding(BuildingTypes buildingType)
     {
-        tasks.Add(new Task(npcName, name, description, difficulty));
+        if (tasks.Count > 0)
+        {
+            foreach (Task task in tasks)
+            {
+                if (task.buildingNeeded == buildingType)
+                {
+                    bool taskCompleted = task.Add();
+                    if (taskCompleted) TaskCompleted(task);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void CreateTask(string npcName, string name, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage)
+    {
+        tasks.Add(new Task(npcName, name, description, difficulty, buildingNeeded, amountNeeded, reward, taskType, emissionsTargetPercentage));
+        SaveTasks();
+    }
+
+    public void TaskCompleted(Task task)
+    {
+        tasks.Remove(task);
+        gameManager.ChangeBalance(task.reward);
         SaveTasks();
     }
 

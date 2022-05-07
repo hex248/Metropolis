@@ -18,4 +18,9 @@ MonoBehaviour:
   - Hello, I am {NPC-NAME}, nice to meet you!
   - There are not enough homes in this city, my friend needs somewhere to live.
   - Could you build some more houses for him?
+  buildingNeeded: 0
+  amountNeeded: 3
+  reward: 1000
   difficulty: 1
+  taskType: 0
+  emissionsTargetPercentage: 0
