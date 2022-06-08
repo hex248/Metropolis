@@ -51,6 +51,9 @@ public class MapBuilder : MonoBehaviour
     {
         GameObject tempBuildingObj = Instantiate(prefabs[building.buildingType.ToString()], new Vector3(y, 0, -x), Quaternion.Euler(0, gameManager.desiredRotation, 0), buildingsParent);
         tempBuildingObj.GetComponent<Building>().building.rotation = gameManager.desiredRotation;
+        tempBuildingObj.GetComponent<Building>().building = building;
+        Debug.Log(tempBuildingObj.GetComponent<Building>().building.x);
+        Debug.Log(tempBuildingObj.GetComponent<Building>().building.y);
     }
 
     public void ClearPreview()

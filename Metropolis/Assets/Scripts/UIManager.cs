@@ -6,6 +6,7 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] GameObject bridgeObject;
     [SerializeField] GameObject actionMenuParent;
     [SerializeField] GameObject constructionCloseButton;
     [SerializeField] GameObject actionButton;
@@ -21,16 +22,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject populationParent;
     [SerializeField] GameObject taskParent;
     [SerializeField] GameObject npcEncounterParent;
+    [SerializeField] GameObject buildingInfoParent;
 
     [SerializeField] Transform tasksPanel;
     [SerializeField] GameObject taskPrefab;
 
+    [SerializeField] GameObject rotationArrows;
 
     [SerializeField] GameObject statsParent;
     [SerializeField] TextMeshProUGUI emissionsText;
     [SerializeField] TextMeshProUGUI balanceText;
     [SerializeField] TextMeshProUGUI timeText;
     [SerializeField] TextMeshProUGUI costOfActionText;
+    [SerializeField] TextMeshProUGUI populationText;
+
+    [SerializeField] GameObject balanceChange;
+    [SerializeField] TextMeshProUGUI balanceChangeText;
+
+    [SerializeField] TextMeshProUGUI optionNamePopupText;
 
     Vector3 constructionDestination = new Vector3(110.0f, 240.0f, 0.0f);
     Vector3 populationDestination = new Vector3(230.0f, 230.0f, 0.0f);
@@ -45,6 +54,8 @@ public class UIManager : MonoBehaviour
     TaskManager taskManager;
     StatisticsManager statsManager;
 
+    string buildingTypeStr = "";
+
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -56,8 +67,10 @@ public class UIManager : MonoBehaviour
         tasksButton.transform.position = buttonOrigin;
 
         actionMenuParent.SetActive(true);
+        rotationArrows.SetActive(true);
         constructionParent.SetActive(false);
         populationParent.SetActive(false);
+        buildingInfoParent.SetActive(false);
         taskParent.SetActive(false);
         npcEncounterParent.SetActive(false);
 
@@ -66,31 +79,39 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (gameManager.currentMode == GamePlayModes.construction || gameManager.currentMode == GamePlayModes.destruction)
+        if (gameManager.playing)
         {
-            constructionParent.SetActive(true);
-            constructionTooltip.SetActive(true);
-            destructionTooltip.SetActive(true);
-            costOfActionText.text = $"Cost of Action: ${gameManager.costOfAction}";
+            if (gameManager.currentMode == GamePlayModes.construction || gameManager.currentMode == GamePlayModes.destruction)
+            {
+                constructionParent.SetActive(true);
+                constructionTooltip.SetActive(true);
+                destructionTooltip.SetActive(true);
+                costOfActionText.text = $"Cost of Action: ${gameManager.costOfAction}";
+                optionNamePopupText.text = buildingTypeStr;
+            }
+            else
+            {
+                constructionParent.SetActive(false);
+            }
+
+            if (gameManager.currentMode == GamePlayModes.construction)
+            {
+                constructionParent.SetActive(true);
+                destructionTooltip.SetActive(false);
+                constructionTooltip.SetActive(true);
+                constructionOptions.SetActive(true);
+            }
+            else if (gameManager.currentMode == GamePlayModes.destruction)
+            {
+                constructionParent.SetActive(true);
+                destructionTooltip.SetActive(true);
+                constructionTooltip.SetActive(false);
+                constructionOptions.SetActive(false);
+            }
         }
         else
         {
             constructionParent.SetActive(false);
-        }
-
-        if (gameManager.currentMode == GamePlayModes.construction)
-        {
-            constructionParent.SetActive(true);
-            destructionTooltip.SetActive(false);
-            constructionTooltip.SetActive(true);
-            constructionOptions.SetActive(true);
-        }
-        else if (gameManager.currentMode == GamePlayModes.destruction)
-        {
-            constructionParent.SetActive(true);
-            destructionTooltip.SetActive(true);
-            constructionTooltip.SetActive(false);
-            constructionOptions.SetActive(false);
         }
 
 
@@ -101,10 +122,10 @@ public class UIManager : MonoBehaviour
                 constructionDestination,
                 Vector3.Distance(constructionButton.transform.position,
                 constructionDestination) * buttonAnimationTime * Time.deltaTime);
-            populationButton.transform.position = Vector3.MoveTowards(populationButton.transform.position,
-                populationDestination,
-                Vector3.Distance(populationButton.transform.position,
-                populationDestination) * buttonAnimationTime * Time.deltaTime);
+            //populationButton.transform.position = Vector3.MoveTowards(populationButton.transform.position,
+            //    populationDestination,
+            //    Vector3.Distance(populationButton.transform.position,
+            //    populationDestination) * buttonAnimationTime * Time.deltaTime);
             tasksButton.transform.position = Vector3.MoveTowards(tasksButton.transform.position,
                 tasksDestination,
                 Vector3.Distance(tasksButton.transform.position,
@@ -145,6 +166,18 @@ public class UIManager : MonoBehaviour
     {
         populationParent.SetActive(false);
     }
+
+    public BuildingInfo ShowBuildingInfo()
+    {
+        buildingInfoParent.SetActive(true);
+        return buildingInfoParent.GetComponent<BuildingInfo>();
+    }
+
+    public void HideBuildingInfo()
+    {
+        buildingInfoParent.SetActive(false);
+    }
+
     public void ShowTaskMenu()
     {
         AddTasksToDisplay();
@@ -214,6 +247,7 @@ public class UIManager : MonoBehaviour
         string timeMinsStr = timeMins < 10 ? $"0{timeMins}" : $"{timeMins}";
         timeText.text = $"{timeHoursStr}:{timeMinsStr}";
 
+        populationText.text = $"{statsManager.stats.population}";
     }
 
     public NPCEncounter NPCPopup()
@@ -222,7 +256,9 @@ public class UIManager : MonoBehaviour
         statsParent.SetActive(false);
         constructionParent.SetActive(false);
         populationParent.SetActive(false);
+        buildingInfoParent.SetActive(false);
         taskParent.SetActive(false);
+        rotationArrows.SetActive(false);
         npcEncounterParent.SetActive(true);
 
 
@@ -233,6 +269,87 @@ public class UIManager : MonoBehaviour
     {
         actionMenuParent.SetActive(true);
         statsParent.SetActive(true);
+        rotationArrows.SetActive(true);
         npcEncounterParent.SetActive(false);
+    }
+
+    public void HideActionButton()
+    {
+        actionButton.SetActive(false);
+        constructionButton.SetActive(false);
+        populationButton.SetActive(false);
+        tasksButton.SetActive(false);
+    }
+
+    public void HideStatistics()
+    {
+        statsParent.SetActive(false);
+    }
+
+    public void HideArrows()
+    {
+        rotationArrows.SetActive(false);
+    }
+
+    public IEnumerator ChangeBalance(int amount)
+    {
+        balanceChange.SetActive(true);
+        balanceChangeText.text = $"+${amount}";
+
+        yield return new WaitForSeconds(1.0f);
+
+        balanceChange.SetActive(false);
+
+        yield return null;
+    }
+
+    public void HoverConstructionOption(GameObject gameObject)
+    {
+        BuildingTypes buildingType = gameObject.GetComponent<ConstructionOption>().buildingType;
+
+        switch (buildingType)
+        {
+            case BuildingTypes.House:
+                buildingTypeStr = "House";
+                break;
+            case BuildingTypes.Flats:
+                buildingTypeStr = "Flats";
+                break;
+            case BuildingTypes.Factory:
+                buildingTypeStr = "Factory";
+                break;
+            case BuildingTypes.Supermarket:
+                buildingTypeStr = "Supermarket";
+                break;
+            case BuildingTypes.School:
+                buildingTypeStr = "School";
+                break;
+            case BuildingTypes.Hospital:
+                buildingTypeStr = "Hospital";
+                break;
+            case BuildingTypes.Tree:
+                buildingTypeStr = "Tree";
+                break;
+            case BuildingTypes.Hedge:
+                buildingTypeStr = "Hedge";
+                break;
+            case BuildingTypes.Grass:
+                buildingTypeStr = "Grass";
+                break;
+            case BuildingTypes.IntersectionRoad:
+                buildingTypeStr = "Road (Intersection)";
+                break;
+            case BuildingTypes.StraightRoad:
+                buildingTypeStr = "Road (Straight)";
+                break;
+            case BuildingTypes.TurnRoad:
+                buildingTypeStr = "Road (Turn)";
+                break;
+        }
+    }
+
+    public void StopHovering()
+    {
+        buildingTypeStr = "";
     }
 }

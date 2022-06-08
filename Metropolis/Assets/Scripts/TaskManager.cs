@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum TaskTypes
 {
@@ -31,9 +32,11 @@ public class Task
 
     public bool seen = false;
 
+    public bool isTutorial;
 
 
-    public Task(string npcName, string taskName, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage)
+
+    public Task(string npcName, string taskName, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage, bool isTutorial)
     {
         this.npcName = npcName;
         this.taskName = taskName;
@@ -44,6 +47,7 @@ public class Task
         this.reward = reward;
         this.taskType = taskType;
         this.emissionsTargetPercentage = emissionsTargetPercentage;
+        this.isTutorial = isTutorial;
     }
 
     public bool Add(int amount=1)
@@ -68,10 +72,16 @@ public class TaskManager : MonoBehaviour
     string savePath;
 
     GameManager gameManager;
+    NPCManager npcManager;
+    AudioManager audioManager;
+    UIManager uiManager;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        npcManager = GameObject.Find("NPCManager").GetComponent<NPCManager>();
+        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         saveDirectory = Application.persistentDataPath + $"/saves/{gameManager.saveName}";
         savePath = saveDirectory + $"/tasks.dat";
 
@@ -95,9 +105,9 @@ public class TaskManager : MonoBehaviour
         }
     }
 
-    public void CreateTask(string npcName, string name, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage)
+    public void CreateTask(string npcName, string name, string description, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage, bool isTutorial)
     {
-        tasks.Add(new Task(npcName, name, description, difficulty, buildingNeeded, amountNeeded, reward, taskType, emissionsTargetPercentage));
+        tasks.Add(new Task(npcName, name, description, difficulty, buildingNeeded, amountNeeded, reward, taskType, emissionsTargetPercentage, isTutorial));
         SaveTasks();
     }
 
@@ -106,6 +116,41 @@ public class TaskManager : MonoBehaviour
         tasks.Remove(task);
         gameManager.ChangeBalance(task.reward);
         SaveTasks();
+        audioManager.PlaySoundEffect("TaskComplete");
+
+        if (task.taskName == "Build a house")
+        {
+            // create a follow up task
+            string[] dialogue = {"Hey! I'm {NPC-NAME}, I just moved into the city!", "It's great here, but it needs some more nature.", "Could you plant some trees?"};
+            List<NPC> npcs = npcManager.allNPCS.FindAll(npc => npc.npcName != "Mr. Blingman");
+            npcManager.PopUp(npcs[Random.Range(0, npcs.Count)], new TaskPreset("Decorate the city", "Use the construction menu to plant 10 trees in order to decorate the city.", dialogue, 3, BuildingTypes.Tree, 10, 1500, TaskTypes.construction, 0, false));
+        }
+        else if (task.taskName == "Decorate the city")
+        {
+            gameManager.playing = false;
+            NPCEncounter npcEncounter = uiManager.NPCPopup();
+
+            string[] dialogue = { $"The trees look amazing! Thank you very much. (+${task.reward})" };
+            npcEncounter.npcNameText.text = task.npcName;
+            npcEncounter.isTask = false;
+            npcEncounter.dialogue = dialogue;
+            npcEncounter.dialogueIndex = 0;
+            npcEncounter.dialogueText.text = dialogue[0];
+            npcEncounter.npcSprite.GetComponent<Image>().sprite = npcManager.allNPCS.Find(npc=>npc.npcName == task.npcName).npcIdleSprite;
+        }
+        else
+        {
+            gameManager.playing = false;
+            NPCEncounter npcEncounter = uiManager.NPCPopup();
+
+            string[] dialogue = { $"Thank you very much, Mayor! (+${task.reward})" };
+            npcEncounter.npcNameText.text = task.npcName;
+            npcEncounter.isTask = false;
+            npcEncounter.dialogue = dialogue;
+            npcEncounter.dialogueIndex = 0;
+            npcEncounter.dialogueText.text = dialogue[0];
+            npcEncounter.npcSprite.GetComponent<Image>().sprite = npcManager.allNPCS.Find(npc => npc.npcName == task.npcName).npcIdleSprite;
+        }
     }
 
     void LoadTasks()

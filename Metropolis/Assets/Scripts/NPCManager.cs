@@ -28,7 +28,7 @@ public class NPCManager : MonoBehaviour
 
         TaskPreset task;
         if (chosenTask) task = chosenTask;
-        else task = taskManager.taskPresets[Random.Range(0, taskManager.taskPresets.FindAll(t => t.taskType == TaskTypes.construction).Count)];
+        else task = taskManager.taskPresets[Random.Range(0, taskManager.taskPresets.FindAll(t => t.taskType == TaskTypes.construction && !t.isTutorial).Count)];
 
         for (int i = 0; i < task.dialogue.Length; i++)
         {
@@ -41,10 +41,12 @@ public class NPCManager : MonoBehaviour
         npcEncounter.npcNameText.text = npc.npcName;
         npcEncounter.dialogueText.text = task.dialogue[0];
         npcEncounter.task = task;
+        npcEncounter.isTask = true;
+        npcEncounter.dialogue = task.dialogue;
         npcEncounter.npc = npc;
         npcEncounter.dialogueIndex = 0;
         npcEncounter.npcSprite.GetComponent<Image>().sprite = npc.npcIdleSprite;
 
-        taskManager.CreateTask(npc.npcName, task.taskName, task.description, task.difficulty, task.buildingNeeded, task.amountNeeded, task.reward, task.taskType, task.emissionsTargetPercentage);
+        taskManager.CreateTask(npc.npcName, task.taskName, task.description, task.difficulty, task.buildingNeeded, task.amountNeeded, task.reward, task.taskType, task.emissionsTargetPercentage, task.isTutorial);
     }
 }

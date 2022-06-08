@@ -6,14 +6,17 @@ using TMPro;
 public enum BuildingTypes
 {
     House,
-    Office,
+    Flats,
     Factory,
-    Shop,
+    Supermarket,
     School,
     Hospital,
     Tree,
     Hedge,
-    Grass
+    Grass,
+    IntersectionRoad,
+    StraightRoad,
+    TurnRoad
 }
 
 [System.Serializable]
@@ -25,8 +28,10 @@ public class GameBuilding
     public string buildingName;
     public BuildingTypes buildingType;
 
-    public GameBuilding(string name, BuildingTypes type)
+    public GameBuilding(int x, int y, string name, BuildingTypes type)
     {
+        this.x = x;
+        this.y = y;
         this.buildingName = name;
         this.buildingType = type;
     }
@@ -39,26 +44,26 @@ public class Building : MonoBehaviour
     public GameBuilding building;
     [SerializeField] string buildingName;
     public BuildingTypes buildingType;
-    [SerializeField] TextMeshProUGUI buildingNameText;
-    GameObject canvas;
     public GameObject box;
     public GameObject model;
     Color boxOriginalColor;
 
     Hover hoverCheck;
     CityManager cityManager;
+    StatisticsManager statsManager;
+    UIManager uiManager;
+    CursorManager cursorManager;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        building = new GameBuilding(buildingName, buildingType);
-        buildingNameText.text = buildingName != "" ? buildingName : $"{buildingType}";
-        canvas = buildingNameText.gameObject.transform.parent.gameObject;
         boxOriginalColor = box.GetComponent<Renderer>().material.color;
         hoverCheck = GameObject.Find("HoverChecker").GetComponent<Hover>();
         cityManager = GameObject.Find("CityManager").GetComponent<CityManager>();
-
+        statsManager = GameObject.Find("StatisticsManager").GetComponent<StatisticsManager>();
+        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        cursorManager = GameObject.Find("CursorManager").GetComponent<CursorManager>();
     }
 
     void Update()
@@ -86,29 +91,19 @@ public class Building : MonoBehaviour
             box.SetActive(false);
         }
 
-        canvas.transform.position = new Vector3(canvas.transform.position.x, transform.localScale.y, canvas.transform.position.z);
         if (hoverCheck.hoverTransform == model.transform)
         {
             // show highlight
             box.GetComponent<Renderer>().material.color = new Color(boxOriginalColor.r*1.8f, boxOriginalColor.g * 1.8f, boxOriginalColor.b * 1.8f, boxOriginalColor.a);
 
-            // show name
-
-            buildingNameText.text = buildingName != "" ? buildingName : buildingType.ToString();
-            // !TEMPORARILY DISABLED WHILE CANVAS CLIPS THROUGH OTHER BUILDINGS
-            //buildingNameText.gameObject.SetActive(true);
             if (Input.GetMouseButtonDown(0) && gameManager.currentMode == GamePlayModes.none)
             {
                 // building selected
-                Debug.Log("SHOW STATS");
                 OnClick();
             }
         }
         else
         {
-            // hide name
-            buildingNameText.gameObject.SetActive(false);
-
             // hide outline
             box.GetComponent<Renderer>().material.color = boxOriginalColor;
         }
@@ -116,6 +111,27 @@ public class Building : MonoBehaviour
 
     void OnClick()
     {
+        if (CanClick())
+        {
+            BuildingInfo info = uiManager.ShowBuildingInfo();
+            info.buildingType = buildingType;
+            Debug.Log(building.x);
+            Debug.Log(building.y);
+            Debug.Log(cityManager.map[building.x][building.y].occupants);
+            info.occupants = cityManager.map[building.x][building.y].occupants;
+            info.moneyGenerated = statsManager.GetMoneyGenerated(buildingType);
+            info.UpdateUI();
+        }
+    }
 
+    bool CanClick()
+    {
+        BuildingTypes[] acceptedBuildingTypes = { BuildingTypes.House, BuildingTypes.Flats, BuildingTypes.Factory, BuildingTypes.Supermarket, BuildingTypes.Hospital };
+        foreach (BuildingTypes type in acceptedBuildingTypes)
+        {
+            Debug.Log(type);
+            if (type == buildingType) return true;
+        }
+        return false;
     }
 }

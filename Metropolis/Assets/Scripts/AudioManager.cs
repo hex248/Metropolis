@@ -7,19 +7,11 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource sfx;
     [SerializeField] AudioSource music;
     [SerializeField] AudioClip insufficientFunds;
+    [SerializeField] AudioClip taskCompleted;
+    [SerializeField] AudioClip npcVoice;
+    AudioClip playingClip;
 
     [SerializeField, Range(0, 100)] float volume;
-
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void PlaySoundEffect(string sfxName)
     {
@@ -29,11 +21,22 @@ public class AudioManager : MonoBehaviour
             case "InsufficientFunds":
                 clip = insufficientFunds;
                 break;
+            case "TaskComplete":
+                clip = taskCompleted;
+                break;
+            case "NPCVoice":
+                clip = npcVoice;
+                break;
             default:
                 clip = insufficientFunds;
                 break;
         }
 
-        if (!sfx.isPlaying) sfx.PlayOneShot(clip, volume/100);
+        if (playingClip != clip)
+        {
+            playingClip = clip;
+
+            sfx.PlayOneShot(clip, volume / 100);
+        }
     }
 }

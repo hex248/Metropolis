@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b96033a82a3b17469a84fe6c3eb2204, type: 3}
+  m_Name: New School
+  m_EditorClassIdentifier: 
+  taskName: New School
+  description: There are not enough schools in the city! Use the construction menu
+    to build one.
+  dialogue:
+  - My son is now of age to attend school, but we can't find one with any spaces!
+  - I'm sure there are other kids who are out of education.
+  - Could you build a new school for us?
+  buildingNeeded: 4
+  amountNeeded: 1
+  reward: 2000
+  difficulty: 2
+  taskType: 0
+  emissionsTargetPercentage: 0
+  isTutorial: 1

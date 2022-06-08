@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum GamePlayModes
 {
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Color oldPavementColor;
     [SerializeField] Color constructionBlockedColor;
     [SerializeField] Color destroyableColor;
+    [SerializeField] GameObject gameOverPanel;
     public BuildingTypes chosenBuilding;
     public int desiredRotation;
 
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour
     MapBuilder mapBuilder;
     TaskManager taskManager;
     NPCManager npcManager;
+    StatisticsManager statsManager;
 
     UIManager ui;
 
@@ -48,6 +51,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        saveDirectory = Application.persistentDataPath + $"/saves/";
+        saveName = GetSaveName();
         saveDirectory = Application.persistentDataPath + $"/saves/{saveName}";
         savePath = saveDirectory + $"/balance.dat";
         LoadBalance();
@@ -57,6 +62,7 @@ public class GameManager : MonoBehaviour
         mapBuilder = GameObject.Find("CityManager").GetComponent<MapBuilder>();
         taskManager = GameObject.Find("TaskManager").GetComponent<TaskManager>();
         npcManager = GameObject.Find("NPCManager").GetComponent<NPCManager>();
+        statsManager = GameObject.Find("StatisticsManager").GetComponent<StatisticsManager>();
 
         ui = GameObject.Find("Canvas").GetComponent<UIManager>();
         playing = true;
@@ -64,38 +70,47 @@ public class GameManager : MonoBehaviour
 
     void LateUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.F8) && playing)
+        if (statsManager.stats.emissions < statsManager.stats.maximumEmissions)
         {
-            npcManager.PopUp();
+            if (Input.GetKeyDown(KeyCode.F8) && playing)
+            {
+                npcManager.PopUp();
+            }
+            if (currentMode == GamePlayModes.construction || currentMode == GamePlayModes.destruction)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    currentMode = GamePlayModes.none;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    currentMode = GamePlayModes.construction;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    mapBuilder.ClearPreview();
+                    currentMode = GamePlayModes.destruction;
+                }
+            }
+            if (currentMode == GamePlayModes.construction)
+            {
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    desiredRotation = Rotate(desiredRotation, 90, RotationTypes.clockwise);
+                }
+            }
         }
-        if (currentMode == GamePlayModes.construction || currentMode == GamePlayModes.destruction)
+        else
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                currentMode = GamePlayModes.none;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                currentMode = GamePlayModes.construction;
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                mapBuilder.ClearPreview();
-                currentMode = GamePlayModes.destruction;
-            }
-        }
-        if (currentMode == GamePlayModes.construction)
-        {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                desiredRotation = Rotate(desiredRotation, 90, RotationTypes.clockwise);
-            }
+            playing = false;
+            StartCoroutine(GameOver());
         }
     }
 
     public void ChangeBalance(int change)
     {
         balance += change;
+        if (change > 0) StartCoroutine(ui.ChangeBalance(change));
         SaveBalance();
     }
 
@@ -103,6 +118,8 @@ public class GameManager : MonoBehaviour
     public void ConstructionButtonPressed()
     {
         currentMode = GamePlayModes.construction;
+        ui.HidePopulationMenu();
+        ui.HideTaskMenu();
         ui.ActionTaken();
     }
 
@@ -185,6 +202,43 @@ public class GameManager : MonoBehaviour
         
         bf.Serialize(file, data);
         file.Close();
+    }
+
+    string GetSaveName()
+    {
+        if (File.Exists(saveDirectory + "/ChosenSave.txt"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(saveDirectory + "/ChosenSave.txt", FileMode.Open);
+            string data = (string)bf.Deserialize(file);
+            file.Close();
+
+            return data;
+        }
+        return "";
+    }
+
+    IEnumerator GameOver()
+    {
+        gameOverPanel.SetActive(true);
+        ui.HideActionButton();
+        ui.HideStatistics();
+        ui.HideArrows();
+        ui.HideNPCPopup();
+        ui.HidePopulationMenu();
+        ui.HideTaskMenu();
+        currentMode = GamePlayModes.none;
+
+        yield return new WaitForSeconds(7.5f);
+
+        TitleScreen();
+
+        yield return null;
+    }
+
+    public void TitleScreen()
+    {
+        SceneManager.LoadScene("Title Screen");
     }
 }
 

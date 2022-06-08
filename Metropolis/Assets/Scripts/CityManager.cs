@@ -11,6 +11,7 @@ public class Cell
     public int y;
     public bool occupied;
     public GameBuilding building;
+    public int occupants = 0;
 
     public Cell(int x, int y)
     {
@@ -26,6 +27,7 @@ public class CityManager : MonoBehaviour
     UIManager uiManager;
     TaskManager taskManager;
     StatisticsManager statsManager;
+    NPCManager npcManager;
 
     MapBuilder mapBuilder;
     public List<List<Cell>> map = new List<List<Cell>>();
@@ -47,20 +49,25 @@ public class CityManager : MonoBehaviour
         uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         taskManager = GameObject.Find("TaskManager").GetComponent<TaskManager>();
         statsManager = GameObject.Find("StatisticsManager").GetComponent<StatisticsManager>();
+        npcManager = GameObject.Find("NPCManager").GetComponent<NPCManager>();
         saveDirectory = Application.persistentDataPath + $"/saves/{gameManager.saveName}";
         savePath = saveDirectory + $"/map.dat";
         // load level
         levelLoaded = false;
 
         constructionCosts.Add(BuildingTypes.House, 300);
-        constructionCosts.Add(BuildingTypes.Office, 750);
+        constructionCosts.Add(BuildingTypes.Flats, 1500);
         constructionCosts.Add(BuildingTypes.Factory, 1500);
-        constructionCosts.Add(BuildingTypes.Shop, 600);
+        constructionCosts.Add(BuildingTypes.Supermarket, 600);
         constructionCosts.Add(BuildingTypes.School, 750);
         constructionCosts.Add(BuildingTypes.Hospital, 900);
         constructionCosts.Add(BuildingTypes.Tree, 100);
         constructionCosts.Add(BuildingTypes.Hedge, 80);
         constructionCosts.Add(BuildingTypes.Grass, 30);
+        constructionCosts.Add(BuildingTypes.IntersectionRoad, 100);
+        constructionCosts.Add(BuildingTypes.StraightRoad, 100);
+        constructionCosts.Add(BuildingTypes.TurnRoad, 100);
+
     }
 
     void LateUpdate()
@@ -125,6 +132,7 @@ public class CityManager : MonoBehaviour
         {
             // start to generate a map as there is no previous save
             GenerateMap();
+            npcManager.PopUp(npcManager.allNPCS.Find(npc => npc.npcName == "Mr. Blingman"), taskManager.taskPresets.Find(task=>task.taskName == "Build a house"));
         }
     }
 
@@ -132,14 +140,28 @@ public class CityManager : MonoBehaviour
     {
         if (gameManager.costOfAction > gameManager.balance)
         {
-            // play insufficient funds sound effect
             audioManager.PlaySoundEffect("InsufficientFunds");
+            // play insufficient funds sound effect
 
             return building;
         }
+
+        int occupants = 0;
+        switch (building.buildingType)
+        {
+            case BuildingTypes.House:
+                occupants += Random.Range(1, 4);
+                break;
+            case BuildingTypes.Flats:
+                occupants += Random.Range(15, 75);
+                break;
+        }
+        
+
         building.x = x;
         building.y = y;
         map[x][y].building = building;
+        map[x][y].occupants = occupants;
         map[x][y].building.rotation = gameManager.desiredRotation;
         map[x][y].occupied = true;
 

@@ -15,6 +15,13 @@ public class CameraController : MonoBehaviour
 
     GameManager gameManager;
 
+    [SerializeField] float xMovement = 0;
+    [SerializeField] float yMovement = 0;
+    [SerializeField] float xRange = 16;
+    [SerializeField] float yRange = 9;
+
+    bool zoom = false;
+
     void Start()
     {
         resetCamera = Camera.main.transform.position;
@@ -29,27 +36,66 @@ public class CameraController : MonoBehaviour
             panSpeed = Camera.main.orthographicSize;
 
             // wasd movement
-            drone.position += (Input.GetAxisRaw("Horizontal") * drone.right * Time.fixedDeltaTime * panSpeed) +
-                (Input.GetAxisRaw("Vertical") * drone.forward * Time.fixedDeltaTime * panSpeed);
+            xMovement += Input.GetAxisRaw("Horizontal") * Time.fixedDeltaTime;
+
+            if (xMovement == Mathf.Clamp(xMovement, -xRange / 2, xRange / 2))
+            {
+                drone.position += (Input.GetAxisRaw("Horizontal") * drone.right * Time.fixedDeltaTime * panSpeed);
+            }
+            else
+            {
+                if (xMovement < -xRange / 2)
+                {
+                    xMovement = -xRange / 2;
+                }
+                else if (xMovement > xRange / 2)
+                {
+                    xMovement = xRange / 2;
+                }
+            }
+
+            yMovement += Input.GetAxisRaw("Vertical") * Time.fixedDeltaTime;
+
+            if (yMovement == Mathf.Clamp(yMovement, -yRange / 2, yRange / 2))
+            {
+                drone.position += (Input.GetAxisRaw("Vertical") * drone.forward * Time.fixedDeltaTime * panSpeed);
+            }
+            else
+            {
+                if (yMovement < -yRange / 2)
+                {
+                    yMovement = -yRange / 2;
+                }
+                else if (yMovement > yRange / 2)
+                {
+                    yMovement = yRange / 2;
+                }
+            }
+
 
             // camera reset
             if (Input.GetMouseButton(2))
             {
                 transform.position = resetCamera;
+                xMovement = 0;
+                yMovement = 0;
             }
 
             // if not hovering over UI
-            if (!EventSystem.current.IsPointerOverGameObject())
+            if (zoom)
             {
-                // zoom out
-                if (Input.mouseScrollDelta.y > 0)
+                if (!EventSystem.current.IsPointerOverGameObject())
                 {
-                    Camera.main.orthographicSize -= zoomChange * Time.deltaTime * smoothChange;
-                }
-                // zoom in
-                if (Input.mouseScrollDelta.y < 0)
-                {
-                    Camera.main.orthographicSize += zoomChange * Time.deltaTime * smoothChange;
+                    // zoom out
+                    if (Input.mouseScrollDelta.y > 0)
+                    {
+                        Camera.main.orthographicSize -= zoomChange * Time.deltaTime * smoothChange;
+                    }
+                    // zoom in
+                    if (Input.mouseScrollDelta.y < 0)
+                    {
+                        Camera.main.orthographicSize += zoomChange * Time.deltaTime * smoothChange;
+                    }
                 }
             }
 

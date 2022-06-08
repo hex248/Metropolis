@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class ConstructionOption : MonoBehaviour
 {
-    [SerializeField] Sprite previewSprite;
-    [SerializeField] GameObject preview;
     public BuildingTypes buildingType;
     GameObject optionPrefab;
     Dictionary<string, GameObject> prefabs = new Dictionary<string, GameObject>();
@@ -22,6 +20,5 @@ public class ConstructionOption : MonoBehaviour
             prefabs.Add(prefab.name, (GameObject)prefab);
         }
         optionPrefab = prefabs[buildingType.ToString()];
-        preview.GetComponent<Image>().sprite = previewSprite;
     }
 }

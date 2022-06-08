@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -213.75, y: 62.763184}
-  m_SizeDelta: {x: 695.3, y: 77.873}
+  m_AnchoredPosition: {x: -182.33508, y: 62.763184}
+  m_SizeDelta: {x: 758.1298, y: 77.873}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &279455129374497338
 CanvasRenderer:
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.83921576, g: 0.36078432, b: 0.36078432, a: 1}
+  m_Color: {r: 0.3372549, g: 0.54509807, b: 0.7372549, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -232,9 +232,17 @@ MonoBehaviour:
   taskDifficultyText: {fileID: 8638235034349730282}
   task:
     npcName: 
-    name: 
+    taskName: 
     description: 
     difficulty: 0
+    buildingNeeded: 0
+    completed: 0
+    amountNeeded: 0
+    reward: 0
+    taskType: 0
+    emissionsTargetPercentage: 0
+    seen: 0
+    isTutorial: 0
 --- !u!1 &5338666316742289403
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,8 +277,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 347.06537, y: 0.79045105}
-  m_SizeDelta: {x: 426.3229, y: 201.82}
+  m_AnchoredPosition: {x: 378.48, y: 0.79045105}
+  m_SizeDelta: {x: 363.5, y: 201.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6212631995066412384
 CanvasRenderer:
@@ -327,8 +335,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -403,8 +411,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -213.74997, y: -7.3}
-  m_SizeDelta: {x: 695.3, y: 77.873}
+  m_AnchoredPosition: {x: -182.34, y: -7.3}
+  m_SizeDelta: {x: 758.13, y: 77.873}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7234948515974850392
 CanvasRenderer:
@@ -537,8 +545,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -213.75, y: -73.17805}
-  m_SizeDelta: {x: 695.3, y: 53.8822}
+  m_AnchoredPosition: {x: -182.34, y: -73.178}
+  m_SizeDelta: {x: 758.12, y: 53.883}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8096003558632281189
 CanvasRenderer:

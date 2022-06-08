@@ -20,4 +20,20 @@ public class TaskPreset : ScriptableObject
     public  TaskTypes taskType;
 
     public float emissionsTargetPercentage;
+
+    public bool isTutorial = false;
+
+    public TaskPreset(string taskName, string description, string[] dialogue, int difficulty, BuildingTypes buildingNeeded, int amountNeeded, int reward, TaskTypes taskType, float emissionsTargetPercentage, bool isTutorial)
+    {
+        this.taskName = taskName;
+        this.description = description;
+        this.dialogue = dialogue;
+        this.difficulty = difficulty;
+        this.buildingNeeded = buildingNeeded;
+        this.amountNeeded = amountNeeded;
+        this.reward = reward;
+        this.taskType = taskType;
+        this.emissionsTargetPercentage = emissionsTargetPercentage;
+        this.isTutorial = isTutorial;
+    }
 }

@@ -7,13 +7,16 @@ using UnityEngine;
 [System.Serializable]
 public class Stats
 {
+    public int population = 0;
     public float emissions;
     public float maximumEmissions = 1000.0f;
 
+
     public float timeOfDay = 9.0f;
 
-    public Stats(float emissions)
+    public Stats(int population, float emissions)
     {
+        this.population = population;
         this.emissions = emissions;
     }
 }
@@ -30,6 +33,7 @@ public class StatisticsManager : MonoBehaviour
     TaskManager taskManager;
     NPCManager npcManager;
     UIManager uiManager;
+    List<BuildingTypes> generateRevenue = new List<BuildingTypes>();
 
     float timePassed = 0.0f;
 
@@ -37,15 +41,21 @@ public class StatisticsManager : MonoBehaviour
 
     void Start()
     {
-        emissions.Add(BuildingTypes.Factory, 100);
-        emissions.Add(BuildingTypes.Hospital, 80);
-        emissions.Add(BuildingTypes.School, 50);
-        emissions.Add(BuildingTypes.Office, 40);
+        generateRevenue.Add(BuildingTypes.Factory);
+        generateRevenue.Add(BuildingTypes.Hospital);
+        generateRevenue.Add(BuildingTypes.Supermarket);
         emissions.Add(BuildingTypes.House, 20);
-        emissions.Add(BuildingTypes.Shop, 20);
+        emissions.Add(BuildingTypes.Flats, 75);
+        emissions.Add(BuildingTypes.Factory, 100);
+        emissions.Add(BuildingTypes.Supermarket, 20);
+        emissions.Add(BuildingTypes.School, 50);
+        emissions.Add(BuildingTypes.Hospital, 80);
         emissions.Add(BuildingTypes.Tree, -10);
         emissions.Add(BuildingTypes.Hedge, -5);
         emissions.Add(BuildingTypes.Grass, -2);
+        emissions.Add(BuildingTypes.IntersectionRoad, 0);
+        emissions.Add(BuildingTypes.StraightRoad, 0);
+        emissions.Add(BuildingTypes.TurnRoad, 0);
 
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         cityManager = GameObject.Find("CityManager").GetComponent<CityManager>();
@@ -62,12 +72,27 @@ public class StatisticsManager : MonoBehaviour
     {
         timePassed += Time.deltaTime;
 
-        // gradually increase balance
+        // gradually increase balance based on buildings in map
         if (timePassed >= 5.0f)
         {
             timePassed = 0.0f;
-
-            gameManager.ChangeBalance(5);
+            int earnings = 0;
+            for (int x = 0; x < cityManager.map.Count; x++)
+            {
+                for (int y = 0; y < cityManager.map[x].Count; y++)
+                {
+                    Cell cell = cityManager.map[x][y];
+                    if (cell.occupied)
+                    {
+                        earnings += GetMoneyGenerated(cell.building.buildingType);
+                        if (generateRevenue.Contains(cell.building.buildingType))
+                        {
+                            earnings += 5;
+                        }
+                    }
+                }
+            }
+            gameManager.ChangeBalance(earnings);
         }
 
         TaskCreationMonitor();
@@ -79,12 +104,6 @@ public class StatisticsManager : MonoBehaviour
 
 
         uiManager.UpdateStats();
-        if (stats.emissions / stats.maximumEmissions >= 1.0f)
-        {
-            // FAIL
-
-            Debug.Log("FAILED");
-        }
     }
 
     private void OnApplicationQuit()
@@ -109,7 +128,7 @@ public class StatisticsManager : MonoBehaviour
         }
         else
         {
-            stats = new Stats(0.0f);
+            stats = new Stats(1, 0.0f);
             SaveStats();
         }
     }
@@ -128,6 +147,7 @@ public class StatisticsManager : MonoBehaviour
     public void BuildingChange()
     {
         CalculateEmissions();
+        CalculatePopulation();
     }
 
     void CalculateEmissions()
@@ -152,44 +172,79 @@ public class StatisticsManager : MonoBehaviour
 
     void TaskCreationMonitor()
     {
-        if (stats.emissions > stats.maximumEmissions / 1.05) // roughly 95%
+        if (stats.emissions >= stats.maximumEmissions / 1.05) // roughly 95%
         {
             // critically high
 
             if (taskManager.tasks.Find(task => task.taskName == "Critically High Emissions") != null) return; // forget if they have already been made aware
-
-            Debug.Log(taskManager.taskPresets.Find(task => task.taskName == "Critically High Emissions"));
 
             npcManager.PopUp(
                 npcManager.allNPCS.Find(npc => npc.npcName == "Mr. Blingman"),
                 taskManager.taskPresets.Find(task => task.taskName == "Critically High Emissions")
                 ); // otherwise, create npc encounter to warn player
         }
-        else if (stats.emissions > stats.maximumEmissions / 1.17) // roughly 85%
+        else if (stats.emissions >= stats.maximumEmissions / 1.17) // roughly 85%
         {
             // too high
 
             if (taskManager.tasks.Find(task => task.taskName == "Very High Emissions") != null) return; // forget if they have already been made aware
-            
-            Debug.Log(taskManager.taskPresets.Find(task => task.taskName == "Very High Emissions"));
 
             npcManager.PopUp(
                 npcManager.allNPCS.Find(npc => npc.npcName == "Mr. Blingman"),
                 taskManager.taskPresets.Find(task => task.taskName == "Very High Emissions")
                 ); // otherwise, create npc encounter to warn player
         }
-        else if (stats.emissions > stats.maximumEmissions / 1.33) // roughly 75%
+        else if (stats.emissions >= stats.maximumEmissions / 1.33) // roughly 75%
         {
             // very high
 
             if (taskManager.tasks.Find(task => task.taskName == "High Emissions") != null) return; // forget if player has already been made aware
-            
-            Debug.Log(taskManager.taskPresets.Find(task => task.taskName == "High Emissions"));
 
             npcManager.PopUp(
                 npcManager.allNPCS.Find(npc => npc.npcName == "Mr. Blingman"),
                 taskManager.taskPresets.Find(task => task.taskName == "High Emissions")
                 ); // otherwise, create npc encounter to warn player
+        }
+
+        int hospitalCount = CountHospitals();
+        if (taskManager.tasks.Find(task => task.taskName == "New Hospital") == null)
+        {
+            if (hospitalCount > 0)
+            {
+                if (stats.population > 20 && stats.population / hospitalCount > 30) // 30 people per hospital
+                {
+                    // too many people for the hospital
+
+                    npcManager.PopUp(null, taskManager.taskPresets.Find(t => t.taskName == "New Hospital"));
+                }
+            }
+            else
+            {
+                if (stats.population > 20)
+                {
+                    npcManager.PopUp(null, taskManager.taskPresets.Find(t => t.taskName == "New Hospital"));
+                }
+            }
+        }
+        int schoolCount = CountSchools();
+        if (taskManager.tasks.Find(task => task.taskName == "New School") == null)
+        {
+            if (schoolCount > 0)
+            {
+                if (stats.population > 10 && stats.population / schoolCount > 75) // 75 people per school
+                {
+                    // too many people for the school
+
+                    npcManager.PopUp(null, taskManager.taskPresets.Find(t => t.taskName == "New School"));
+                }
+            }
+            else
+            {
+                if (stats.population > 10)
+                {
+                    npcManager.PopUp(null, taskManager.taskPresets.Find(t => t.taskName == "New School"));
+                }
+            }
         }
     }
 
@@ -207,6 +262,82 @@ public class StatisticsManager : MonoBehaviour
                 taskManager.TaskCompleted(task);
             }
         }
+    }
+
+    void CalculatePopulation()
+    {
+        int population = 0;
+        for (int x = 0; x < cityManager.map.Count; x++)
+        {
+            for (int y = 0; y < cityManager.map[x].Count; y++)
+            {
+                Cell cell = cityManager.map[x][y];
+                if (cell.occupied)
+                {
+                    population += cell.occupants;
+                }
+            }
+        }
+        stats.population = population;
+
+        SaveStats();
+    }
+
+    int CountHospitals()
+    {
+        int num = 0;
+        for (int x = 0; x < cityManager.map.Count; x++)
+        {
+            for (int y = 0; y < cityManager.map[x].Count; y++)
+            {
+                Cell cell = cityManager.map[x][y];
+                if (cell.occupied && cell.building.buildingType == BuildingTypes.Hospital)
+                {
+                    num++;
+                }
+            }
+        }
+
+        return num;
+    }
+    int CountSchools()
+    {
+        int num = 0;
+        for (int x = 0; x < cityManager.map.Count; x++)
+        {
+            for (int y = 0; y < cityManager.map[x].Count; y++)
+            {
+                Cell cell = cityManager.map[x][y];
+                if (cell.occupied && cell.building.buildingType == BuildingTypes.School)
+                {
+                    num++;
+                }
+            }
+        }
+
+        return num;
+    }
+
+    public int GetMoneyGenerated(BuildingTypes type)
+    {
+        int money = 0;
+        switch (type)
+        {
+            case BuildingTypes.Hospital:
+                money = 50;
+                break;
+            case BuildingTypes.Supermarket:
+                money = 100;
+                break;
+            case BuildingTypes.Factory:
+                money = 200;
+                break;
+            default:
+                money = 0;
+                break;
+        }
+
+        return money;
     }
 }
 

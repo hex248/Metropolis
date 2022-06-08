@@ -32,7 +32,7 @@ public class Plot : MonoBehaviour
             GetComponent<Renderer>().material.color = new Color(originalColor.r * 1.8f, originalColor.g * 1.8f, originalColor.b * 1.8f, originalColor.a);
 
             // show building preview
-            cityManager.ShowBuildingPreview(x, y, new GameBuilding("", gameManager.chosenBuilding));
+            cityManager.ShowBuildingPreview(x, y, new GameBuilding(x, y, "", gameManager.chosenBuilding));
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -40,14 +40,14 @@ public class Plot : MonoBehaviour
                 // on click:
                 if (cityManager.map.Count >= x && cityManager.map[x].Count >= y && !cityManager.map[x][y].occupied)
                 {
-                    cityManager.PlaceBuilding(x, y, new GameBuilding("", gameManager.chosenBuilding));
+                    cityManager.PlaceBuilding(x, y, new GameBuilding(x, y, "", gameManager.chosenBuilding));
                 }
             }
             if (mapBuilder.currentPreviewPos != new Vector2(x, y))
             {
                 // if preview is not at these coordinates
 
-                cityManager.ShowBuildingPreview(x, y, new GameBuilding("", gameManager.chosenBuilding));
+                cityManager.ShowBuildingPreview(x, y, new GameBuilding(x, y, "", gameManager.chosenBuilding));
             }
         }
         else
